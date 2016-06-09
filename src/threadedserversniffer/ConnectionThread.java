@@ -82,7 +82,9 @@ public class ConnectionThread extends Thread {
                 ThreadedServerSniffer.addressesChecked++;
                 sem.release();
                 if (ThreadedServerSniffer.addressesChecked % (double) (ThreadedServerSniffer.LOOPS / 20) == 0) {
-                    System.out.print(".");
+                    if (!ThreadedServerSniffer.basic_output) {
+                        System.out.print(".");
+                    }
                 }
                 if (e.getMessage().equals("Connection refused: connect")) { //Check if the connection was forcibly blocked.
                     try {
@@ -96,7 +98,7 @@ public class ConnectionThread extends Thread {
             } catch (NullPointerException en) {
             }
         } catch (InterruptedException ex) {
-            Logger.getLogger(ConnectionThread.class.getName()).log(Level.SEVERE, null, ex);
+
         }
     }
 }
