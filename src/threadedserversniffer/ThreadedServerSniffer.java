@@ -41,48 +41,60 @@ public class ThreadedServerSniffer {
 
         sem = new Semaphore(1);
         semPoss = new Semaphore(1);
-
-        if (args.length != 3) { //Check the arguments and generate a usage message if an inbalid  number of arguments were entered.
-            System.out.println("Usage- [PORT] [ITTERATIONS] [TIMEOUT]");
-        } else {
-            PORT = Integer.parseInt(args[0]);
-            LOOPS = Integer.parseInt(args[1]);
-            TIMEOUT_VALUE = Integer.parseInt(args[2]);
-
-            System.out.println("Checking " + LOOPS + " IP addresses on port " + PORT + " with a timeout value of " + TIMEOUT_VALUE + "ms");
-
-            for (int i = 0; i < LOOPS; i++) {
-                new ConnectionThread(generatePublicIP(), PORT, servers, possibleServers, sem, semPoss).start(); //Create the threads
-            }
-
-            while (addressesChecked != LOOPS) { //Wait here until all threads are completed excecution.
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException ex) {
-
-                }
-            }
-
-            System.out.println("");
-
-            if (servers.isEmpty() && possibleServers.isEmpty()) { //Check if any servers were found.
-                System.out.println("No servers found on port number " + PORT);
+        
+        try{
+            if (args.length != 3) { //Check the arguments and generate a usage message if an inbalid  number of arguments were entered.
+                throw new IllegalArgumentException("Usage- [PORT] [ITTERATIONS] [TIMEOUT]");
             } else {
-                System.out.println(servers.size() + " server(s) and " + possibleServers.size() + " possible server(s) found on port number " + PORT + " -");
-                if (!servers.isEmpty()) { //Check if any servers were found and display them.
-                    System.out.println("Servers-");
-                    for (String ip : servers) {
-                        System.out.println(ip);
+                PORT = Integer.parseInt(args[0]);
+                LOOPS = Integer.parseInt(args[1]);
+                TIMEOUT_VALUE = Integer.parseInt(args[2]);
+                
+                if(PORT < 0 || LOOPS < 0 || TIMEOUT_VALUE < 0){
+                    throw new IllegalArgumentException("Usage- [PORT] [ITTERATIONS] [TIMEOUT]");
+                }
+                
+                System.out.println("Checking " + LOOPS + " IP addresses on port " + PORT + " with a timeout value of " + TIMEOUT_VALUE + "ms");
+
+                for (int i = 0; i < LOOPS; i++) {
+                    new ConnectionThread(generatePublicIP(), PORT, servers, possibleServers, sem, semPoss).start(); //Create the threads
+                }
+
+                if(LOOPS < 20){
+                    System.out.println("....................");
+                }
+
+                while (addressesChecked != LOOPS) { //Wait here until all threads are completed excecution.
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException ex) {
+
                     }
                 }
-                if (!possibleServers.isEmpty()) { //Check if any possible servers were found and display them.
-                    System.out.println("\nPossible servers-");
-                    for (String ip : possibleServers) {
-                        System.out.println(ip);
+
+                System.out.println("");
+
+                if (servers.isEmpty() && possibleServers.isEmpty()) { //Check if any servers were found.
+                    System.out.println("No servers found on port number " + PORT);
+                } else {
+                    System.out.println(servers.size() + " server(s) and " + possibleServers.size() + " possible server(s) found on port number " + PORT + " -");
+                    if (!servers.isEmpty()) { //Check if any servers were found and display them.
+                        System.out.println("Servers-");
+                        for (String ip : servers) {
+                            System.out.println(ip);
+                        }
                     }
+                    if (!possibleServers.isEmpty()) { //Check if any possible servers were found and display them.
+                        System.out.println("\nPossible servers-");
+                        for (String ip : possibleServers) {
+                            System.out.println(ip);
+                        }
+                    }
+                    System.out.println("\n" + (int) (servers.size() + possibleServers.size()) + " servers found");
                 }
-                System.out.println("\n" + (int) (servers.size() + possibleServers.size()) + " servers found");
             }
+        } catch(IllegalArgumentException ex){
+            System.out.println(ex.getMessage());
         }
     }
 
