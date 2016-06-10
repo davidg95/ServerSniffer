@@ -20,30 +20,37 @@ import java.util.concurrent.Semaphore;
  */
 public class ConnectionThread extends Thread {
 
-    String HOST;
-    int PORT;
-    List<String> servers;
-    List<String> possibleServers;
-    Semaphore sem;
-    Semaphore semPoss;
-    Socket s;
+    private final String HOST;
+    private final int PORT;
+    private final int TIMEOUT_VALUE;
+    private final int LOOPS;
+    private final List<String> servers;
+    private final List<String> possibleServers;
+    private final Semaphore sem;
+    private final Semaphore semPoss;
+    private Socket s;
 
     /**
      * Constructor method for the thread.
      *
      * @param HOST the host which is being checked
-     * @param PORT the port it is being checked on.
+     * @param PORT the port it is being checked on
+     * @param TIMEOUT_VALUE the timeout value for the connection
+     * @param LOOPS the number of IP addresses getting checked altogether, this
+     * is required for the loading dots
      * @param servers the list for storing IP addresses which have servers
      * running on the specified port.
      * @param possibleServers the list for storing IP addresses which have
      * possible servers, an address is added to the list of no reply was
-     * received but the connection gets blocked.
-     * @param sem the semaphore to protect the servers list.
-     * @param semPoss the semaphore to protect the possible servers list.
+     * received but the connection gets blocked
+     * @param sem the semaphore to protect the servers list
+     * @param semPoss the semaphore to protect the possible servers list
      */
-    public ConnectionThread(String HOST, int PORT, List<String> servers, List<String> possibleServers, Semaphore sem, Semaphore semPoss) {
+    public ConnectionThread(String HOST, int PORT, int TIMEOUT_VALUE, int LOOPS, List<String> servers, List<String> possibleServers, Semaphore sem, Semaphore semPoss) {
         this.HOST = HOST;
         this.PORT = PORT;
+        this.TIMEOUT_VALUE = TIMEOUT_VALUE;
+        this.LOOPS = LOOPS;
         this.servers = servers;
         this.possibleServers = possibleServers;
         this.sem = sem;
@@ -57,12 +64,12 @@ public class ConnectionThread extends Thread {
     public void run() {
         try {
             s = new Socket();
-            s.connect(new InetSocketAddress(HOST, PORT), ServerSniffer.TIMEOUT_VALUE); //Try make a connection
+            s.connect(new InetSocketAddress(HOST, PORT), TIMEOUT_VALUE); //Try make a connection
 
             //Flow of excecution only reaches this point of a connection was successful.
             sem.acquire();
             ServerSniffer.addressesChecked++;
-            if (ServerSniffer.addressesChecked % (ServerSniffer.LOOPS / 20) == 0) { //Check how many addresses have been scanend and add anohter dot to the progress bar.
+            if (ServerSniffer.addressesChecked % (LOOPS / 20) == 0) { //Check how many addresses have been scanend and add anohter dot to the progress bar.
                 System.out.print(".");
             }
             servers.add(HOST);
@@ -78,7 +85,7 @@ public class ConnectionThread extends Thread {
             try {
                 ServerSniffer.addressesChecked++;
                 sem.release();
-                if (ServerSniffer.addressesChecked % (double) (ServerSniffer.LOOPS / 20) == 0) {
+                if (ServerSniffer.addressesChecked % (double) (LOOPS / 20) == 0) {
                     if (!ServerSniffer.basic_output) {
                         System.out.print(".");
                     }
