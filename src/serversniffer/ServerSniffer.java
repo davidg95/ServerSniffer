@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package threadedserversniffer;
+package serversniffer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,11 +13,11 @@ import java.util.concurrent.Semaphore;
  * Server sniffer application which accepts a port number, number of iterations
  * and timeout value as arguments and will try random IP address to see if it
  * gets any replies on the designated port number. it also accepts a
- * -basicoutput flag which will limit console output to IP addresses alone
+ * -b flag which will limit console output to IP addresses alone
  *
  * @author David
  */
-public class ThreadedServerSniffer {
+public class ServerSniffer {
 
     public static int PORT;
     public static int LOOPS;
@@ -34,11 +34,27 @@ public class ThreadedServerSniffer {
     public static boolean basic_output = false;
 
     /**
-     * Main method which handles the main program logic.
+     * Main method which takes in the arguments and creates a new ServerSniffer object.
      *
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        new ServerSniffer().start(args);
+    }
+    
+    /**
+     * Blank constructor to initialise the sniffer.
+     */
+    public ServerSniffer() {
+        
+    }
+    
+    /**
+     * Method which handles the main logic.
+     *
+     * @param args the command line arguments
+     */
+    public void start(String[] args){
         servers = new ArrayList<>();
         possibleServers = new ArrayList<>();
 
@@ -47,11 +63,11 @@ public class ThreadedServerSniffer {
 
         try {
             if (args[0].equals("?")) {
-                System.out.println("Usage- [PORT] [ITTERATIONS] [TIMEOUT] -basicoutput");
+                System.out.println("Usage- [PORT] [ITTERATIONS] [TIMEOUT] -b");
                 System.out.println("PORT - The port to check. Must be within range 0 to 65525. Integer.");
                 System.out.println("ITTERATIONS - The number of times you want to loop. Integer.");
                 System.out.println("TIMEOUT - The time out value to wait for a reply from each ip address. Integer.");
-                System.out.println("-basicoutput - OPTIONAL. Only outputs IP addresses and nothing else.");
+                System.out.println("-b - OPTIONAL. Only outputs IP addresses and nothing else.");
             } else if (args.length < 3 || args.length > 4) { //Check the arguments and generate a usage message if an inbalid  number of arguments were entered.
                 throw new IllegalArgumentException("Usage- [PORT] [ITTERATIONS] [TIMEOUT]");
             } else {
@@ -60,10 +76,10 @@ public class ThreadedServerSniffer {
                 TIMEOUT_VALUE = Integer.parseInt(args[2]);
 
                 if (args.length == 4) { //Check if the basic output flag was passsed in.
-                    if (args[3].equals("-basicoutput")) {
+                    if (args[3].equals("-b")) {
                         basic_output = true;
                     } else {
-                        throw new IllegalArgumentException("Usage- [PORT] [ITTERATIONS] [TIMEOUT] -basicoutput");
+                        throw new IllegalArgumentException("Usage- [PORT] [ITTERATIONS] [TIMEOUT] -b");
                     }
                 }
 
@@ -136,7 +152,7 @@ public class ThreadedServerSniffer {
      *
      * @return valid public IP address as a String.
      */
-    public static String generatePublicIP() {
+    public String generatePublicIP() {
         boolean valid = false;
         int octet1 = 0;
         int octet2 = 0;

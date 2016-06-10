@@ -3,15 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package threadedserversniffer;
+package serversniffer;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.List;
 import java.util.concurrent.Semaphore;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * The thread class to handle the individual connections, a new thread is
@@ -59,12 +57,12 @@ public class ConnectionThread extends Thread {
     public void run() {
         try {
             s = new Socket();
-            s.connect(new InetSocketAddress(HOST, PORT), ThreadedServerSniffer.TIMEOUT_VALUE); //Try make a connection
+            s.connect(new InetSocketAddress(HOST, PORT), ServerSniffer.TIMEOUT_VALUE); //Try make a connection
 
             //Flow of excecution only reaches this point of a connection was successful.
             sem.acquire();
-            ThreadedServerSniffer.addressesChecked++;
-            if (ThreadedServerSniffer.addressesChecked % (ThreadedServerSniffer.LOOPS / 20) == 0) { //Check how many addresses have been scanend and add anohter dot to the progress bar.
+            ServerSniffer.addressesChecked++;
+            if (ServerSniffer.addressesChecked % (ServerSniffer.LOOPS / 20) == 0) { //Check how many addresses have been scanend and add anohter dot to the progress bar.
                 System.out.print(".");
             }
             servers.add(HOST);
@@ -76,13 +74,12 @@ public class ConnectionThread extends Thread {
             try {
                 sem.acquire();
             } catch (InterruptedException ex) {
-                Logger.getLogger(ConnectionThread.class.getName()).log(Level.SEVERE, null, ex);
             }
             try {
-                ThreadedServerSniffer.addressesChecked++;
+                ServerSniffer.addressesChecked++;
                 sem.release();
-                if (ThreadedServerSniffer.addressesChecked % (double) (ThreadedServerSniffer.LOOPS / 20) == 0) {
-                    if (!ThreadedServerSniffer.basic_output) {
+                if (ServerSniffer.addressesChecked % (double) (ServerSniffer.LOOPS / 20) == 0) {
+                    if (!ServerSniffer.basic_output) {
                         System.out.print(".");
                     }
                 }
@@ -90,7 +87,6 @@ public class ConnectionThread extends Thread {
                     try {
                         semPoss.acquire();
                     } catch (InterruptedException ex) {
-                        Logger.getLogger(ConnectionThread.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     possibleServers.add(HOST);
                     semPoss.release();
