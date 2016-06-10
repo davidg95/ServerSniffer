@@ -66,7 +66,7 @@ public class ConnectionThread extends Thread {
             s = new Socket();
             s.connect(new InetSocketAddress(HOST, PORT), TIMEOUT_VALUE); //Try make a connection
 
-            //Flow of excecution only reaches this point of a connection was successful.
+            //Flow of excecution only reaches this point if a connection was successful.
             sem.acquire();
             ServerSniffer.addressesChecked++;
             if (ServerSniffer.addressesChecked % (LOOPS / 20) == 0) { //Check how many addresses have been scanend and add anohter dot to the progress bar.
@@ -101,7 +101,6 @@ public class ConnectionThread extends Thread {
             } catch (NullPointerException en) {
             }
         } catch (InterruptedException ex) {
-
         }
     }
 }

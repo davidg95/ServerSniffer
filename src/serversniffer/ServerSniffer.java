@@ -104,7 +104,7 @@ public class ServerSniffer {
             new ConnectionThread(generatePublicIP(), PORT, TIMEOUT_VALUE, LOOPS, servers, possibleServers, sem, semPoss).start(); //Create the threads
         }
 
-        if (LOOPS < 20) {
+        if (LOOPS < 20) { //If loops is less than 20 then just print 20 dots to screen as the thread wont be able to.
             if (!basic_output) {
                 System.out.println("....................");
             }
