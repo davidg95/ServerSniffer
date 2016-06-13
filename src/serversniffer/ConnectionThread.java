@@ -69,7 +69,7 @@ public class ConnectionThread extends Thread {
             //Flow of excecution only reaches this point if a connection was successful.
             sem.acquire();
             ServerSniffer.addressesChecked++;
-            if (ServerSniffer.addressesChecked % (LOOPS / 20) == 0) { //Check how many addresses have been scanend and add anohter dot to the progress bar.
+            if (ServerSniffer.addressesChecked % (double) (LOOPS / 20) == 0) { //Check how many addresses have been scanend and add anohter dot to the progress bar.
                 System.out.print(".");
             }
             servers.add(HOST);
