@@ -74,9 +74,8 @@ public class ConnectionThread extends Thread {
             }
             servers.add(HOST);
             sem.release();
-
+            
             s.close();
-
         } catch (IOException e) { //If full connection was not established.
             try {
                 sem.acquire();
