@@ -6,7 +6,9 @@
 package serversniffer;
 
 import java.awt.GraphicsEnvironment;
+import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
@@ -24,6 +26,10 @@ public class ServerSniffer {
     public int LOOPS;
     public int TIMEOUT_VALUE;
 
+    private long startTime;
+    private long finnishTime;
+    private long duration;
+
     public static int addressesChecked = 0;
 
     private List<String> servers;
@@ -35,7 +41,6 @@ public class ServerSniffer {
     public static GUI g;
 
     public static boolean gui = false;
-
     public static boolean basic_output = false;
 
     /**
@@ -125,6 +130,8 @@ public class ServerSniffer {
             g.log("Checking " + LOOPS + " IP addresses on port " + PORT + " with a timeout value of " + TIMEOUT_VALUE + "ms");
         }
 
+        startTime = Calendar.getInstance().getTimeInMillis();
+
         for (int i = 0; i < LOOPS; i++) {
             new ConnectionThread(generatePublicIP(), PORT, TIMEOUT_VALUE, LOOPS, servers, possibleServers, sem, semPoss).start(); //Create the threads
         }
@@ -142,10 +149,14 @@ public class ServerSniffer {
 
             }
         }
+        
+        finnishTime = Calendar.getInstance().getTimeInMillis();
 
+        duration = finnishTime - startTime;
+        
         if (gui) {
             g.complete();
-            g.log("Scan complete!");
+            g.log("Scan complete in " + (duration / 1000) + "s!");
             if (servers.isEmpty() && possibleServers.isEmpty()) {
                 g.log("No servers found on port number " + PORT);
             } else {
@@ -206,11 +217,7 @@ public class ServerSniffer {
             octet4 = (int) (Math.random() * 255);
 
             //Check that the IP is a valid usable public IP address.
-            if (octet1 == 0 || (octet1 == 10 && octet2 >= 64 && octet2 <= 127) || octet1 == 127 || (octet1 == 169 && octet2 == 254) || (octet1 == 172 && octet2 >= 16 && octet2 <= 31) || (octet1 == 192 && octet2 == 0 && (octet3 == 0 || octet3 == 2)) || (octet1 == 192 && octet2 == 88 && octet3 == 99) || (octet1 == 192 && octet2 == 168) || (octet1 == 198 && (octet2 == 18 || (octet2 == 52 && octet2 == 100))) || (octet1 == 203 && octet2 == 0 && octet3 == 113) || octet1 >= 224) {
-                valid = false;
-            } else {
-                valid = true;
-            }
+            valid = !(octet1 == 0 || (octet1 == 10 && octet2 >= 64 && octet2 <= 127) || octet1 == 127 || (octet1 == 169 && octet2 == 254) || (octet1 == 172 && octet2 >= 16 && octet2 <= 31) || (octet1 == 192 && octet2 == 0 && (octet3 == 0 || octet3 == 2)) || (octet1 == 192 && octet2 == 88 && octet3 == 99) || (octet1 == 192 && octet2 == 168) || (octet1 == 198 && (octet2 == 18 || (octet2 == 52 && octet2 == 100))) || (octet1 == 203 && octet2 == 0 && octet3 == 113) || octet1 >= 224);
         }
 
         return octet1 + "." + octet2 + "." + octet3 + "." + octet4;

@@ -5,6 +5,8 @@
  */
 package serversniffer;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.DefaultListModel;
 import javax.swing.SwingUtilities;
 
@@ -26,8 +28,6 @@ public class GUI extends javax.swing.JFrame {
         possibleModel = new DefaultListModel();
         lstAddresses.setModel(addressesModel);
         lstPossibleAddresses.setModel(possibleModel);
-        jScrollPane1.setVerticalScrollBarPolicy(javax.swing.JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        jScrollPane2.setVerticalScrollBarPolicy(javax.swing.JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
     }
 
     public void log(String text) {
@@ -46,6 +46,7 @@ public class GUI extends javax.swing.JFrame {
         SwingUtilities.invokeLater(() -> {
             addressesModel.addElement(ip);
             lstAddresses.setModel(addressesModel);
+            lblFound.setText("Servers Found: " + addressesModel.size());
         });
     }
 
@@ -53,10 +54,11 @@ public class GUI extends javax.swing.JFrame {
         SwingUtilities.invokeLater(() -> {
             possibleModel.addElement(ip);
             lstPossibleAddresses.setModel(possibleModel);
+            lblPossibleFound.setText("Servers Found: " + possibleModel.size());
         });
     }
-    
-    public void complete(){
+
+    public void complete() {
         prgBar.setValue(100);
         txtPort.setEnabled(true);
         txtIterations.setEnabled(true);
@@ -87,16 +89,19 @@ public class GUI extends javax.swing.JFrame {
         lblTimeout = new javax.swing.JLabel();
         btnScan = new javax.swing.JButton();
         btnClear = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        lstAddresses = new javax.swing.JList<>();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        lstPossibleAddresses = new javax.swing.JList<>();
         prgBar = new javax.swing.JProgressBar();
         btnClose = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         txtLog = new javax.swing.JTextArea();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
+        lblMessage = new javax.swing.JLabel();
+        lblFound = new javax.swing.JLabel();
+        lblPossibleFound = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        lstAddresses = new javax.swing.JList<>();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        lstPossibleAddresses = new javax.swing.JList<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("ServerSniffer");
@@ -172,32 +177,6 @@ public class GUI extends javax.swing.JFrame {
                 .addComponent(btnClear))
         );
 
-        jScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-
-        lstAddresses.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
-        lstAddresses.setMaximumSize(new java.awt.Dimension(1000, 1000));
-        lstAddresses.setMinimumSize(new java.awt.Dimension(0, 0));
-        lstAddresses.setPreferredSize(new java.awt.Dimension(150, 80));
-        jScrollPane1.setViewportView(lstAddresses);
-
-        jScrollPane2.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        jScrollPane2.setMaximumSize(new java.awt.Dimension(1000, 1000));
-        jScrollPane2.setMinimumSize(new java.awt.Dimension(0, 0));
-
-        lstPossibleAddresses.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
-        lstPossibleAddresses.setMaximumSize(new java.awt.Dimension(1000, 1000));
-        lstPossibleAddresses.setMinimumSize(new java.awt.Dimension(0, 0));
-        lstPossibleAddresses.setPreferredSize(new java.awt.Dimension(150, 80));
-        jScrollPane2.setViewportView(lstPossibleAddresses);
-
         prgBar.setPreferredSize(null);
 
         btnClose.setText("Close");
@@ -217,6 +196,24 @@ public class GUI extends javax.swing.JFrame {
 
         jLabel2.setText("Possible Servers-");
 
+        lblFound.setText("Servers Found: 0");
+
+        lblPossibleFound.setText("Servers Found: 0");
+
+        lstAddresses.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane1.setViewportView(lstAddresses);
+
+        lstPossibleAddresses.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane2.setViewportView(lstPossibleAddresses);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -224,23 +221,26 @@ public class GUI extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(lblMessage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnClose))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(panelScan, javax.swing.GroupLayout.PREFERRED_SIZE, 397, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jScrollPane3)
-                        .addComponent(prgBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(prgBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panelScan, javax.swing.GroupLayout.DEFAULT_SIZE, 420, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel1))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel1)
+                            .addComponent(lblFound))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane2)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lblPossibleFound)
+                                    .addComponent(jLabel2))
+                                .addGap(0, 122, Short.MAX_VALUE)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -253,49 +253,71 @@ public class GUI extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(prgBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnClose)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblPossibleFound)
+                    .addComponent(lblFound))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnClose, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblMessage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnScanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnScanActionPerformed
-        prgBar.setValue(0);
-        txtPort.setEnabled(false);
-        txtIterations.setEnabled(false);
-        txtTimeout.setEnabled(false);
-        lblPort.setEnabled(false);
-        lblIterations.setEnabled(false);
-        lblTimeout.setEnabled(false);
-        btnScan.setEnabled(false);
-        btnClear.setEnabled(false);
-        panelScan.setEnabled(false);
-        txtLog.setText("");
-        addressesModel.setSize(0);
-        possibleModel.setSize(0);
-        lstAddresses.setModel(addressesModel);
-        lstPossibleAddresses.setModel(possibleModel);
-        repaint();
-        int port = Integer.parseInt(txtPort.getText());
-        int iterations = Integer.parseInt(txtIterations.getText());
-        int timeout = Integer.parseInt(txtTimeout.getText());
+        if (txtPort.getText().equals("")
+                || txtIterations.getText().equals("")
+                || txtTimeout.equals("")) {
+            lblMessage.setText("Please enter all required fields");
+        } else {
+            Pattern pattern = Pattern.compile("^([0-9])+$");
+            Matcher m1 = pattern.matcher(txtPort.getText());
+            Matcher m2 = pattern.matcher(txtIterations.getText());
+            Matcher m3 = pattern.matcher(txtTimeout.getText());
 
-        ServerSniffer ss = new ServerSniffer(port, iterations, timeout);
-        new Thread(){
-            @Override
-            public void run() {
-                ss.start();
+            if (m1.find() && m2.find() && m3.find()) {
+                prgBar.setValue(0);
+                txtPort.setEnabled(false);
+                txtIterations.setEnabled(false);
+                txtTimeout.setEnabled(false);
+                lblPort.setEnabled(false);
+                lblIterations.setEnabled(false);
+                lblTimeout.setEnabled(false);
+                btnScan.setEnabled(false);
+                btnClear.setEnabled(false);
+                panelScan.setEnabled(false);
+                txtLog.setText("");
+                addressesModel.setSize(0);
+                possibleModel.setSize(0);
+                lstAddresses.setModel(addressesModel);
+                lstPossibleAddresses.setModel(possibleModel);
+                lblMessage.setText("");
+                
+                int port = Integer.parseInt(txtPort.getText());
+                int iterations = Integer.parseInt(txtIterations.getText());
+                int timeout = Integer.parseInt(txtTimeout.getText());
+
+                ServerSniffer ss = new ServerSniffer(port, iterations, timeout);
+                new Thread() {
+                    @Override
+                    public void run() {
+                        ss.start();
+                    }
+                }.start();
+            } else {
+                lblMessage.setText("Please only enter numerical values");
             }
-        }.start();
+        }
     }//GEN-LAST:event_btnScanActionPerformed
 
     private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
@@ -317,8 +339,11 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JLabel lblFound;
     private javax.swing.JLabel lblIterations;
+    private javax.swing.JLabel lblMessage;
     private javax.swing.JLabel lblPort;
+    private javax.swing.JLabel lblPossibleFound;
     private javax.swing.JLabel lblTimeout;
     private javax.swing.JList<String> lstAddresses;
     private javax.swing.JList<String> lstPossibleAddresses;
