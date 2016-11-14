@@ -5,6 +5,7 @@
  */
 package serversniffer;
 
+import java.awt.GraphicsEnvironment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -31,6 +32,10 @@ public class ServerSniffer {
     private Semaphore sem;
     private Semaphore semPoss;
 
+    public static GUI g;
+
+    public static boolean gui = false;
+
     public static boolean basic_output = false;
 
     /**
@@ -41,32 +46,47 @@ public class ServerSniffer {
      */
     public static void main(String[] args) {
         try {
-            if (args[0].equals("?")) {
-                System.out.println("Usage- [PORT] [ITTERATIONS] [TIMEOUT] -b");
-                System.out.println("PORT - The port to check. Must be within range 0 to 65525. Integer.");
-                System.out.println("ITTERATIONS - The number of times you want to loop. Integer.");
-                System.out.println("TIMEOUT - The time out value to wait for a reply from each ip address. Integer.");
-                System.out.println("-b - OPTIONAL. Only outputs IP addresses and nothing else.");
-            } else if (args.length < 3 || args.length > 4) { //Check the arguments and generate a usage message if an inbalid  number of arguments were entered.
-                throw new IllegalArgumentException("Usage- [PORT] [ITTERATIONS] [TIMEOUT]");
+            if (args.length == 0) {
+                if (!GraphicsEnvironment.isHeadless()) {
+                    gui = true;
+                    g = new GUI();
+                    g.setVisible(true);
+                } else {
+                    System.out.println("No graphics enviroment detected");
+                    System.out.println("Usage- [PORT] [ITTERATIONS] [TIMEOUT] -b");
+                    System.out.println("PORT - The port to check. Must be within range 0 to 65525. Integer.");
+                    System.out.println("ITTERATIONS - The number of times you want to loop. Integer.");
+                    System.out.println("TIMEOUT - The time out value to wait for a reply from each ip address. Integer.");
+                    System.out.println("-b - OPTIONAL. Only outputs IP addresses and nothing else.");
+                }
             } else {
-                int PORT = Integer.parseInt(args[0]);
-                int LOOPS = Integer.parseInt(args[1]);
-                int TIMEOUT_VALUE = Integer.parseInt(args[2]);
-
-                if (args.length == 4) { //Check if the basic output flag was passsed in.
-                    if (args[3].equals("-b")) {
-                        basic_output = true;
-                    } else {
-                        throw new IllegalArgumentException("Usage- [PORT] [ITTERATIONS] [TIMEOUT] -b");
-                    }
-                }
-
-                if (PORT < 0 || LOOPS < 0 || TIMEOUT_VALUE < 0) {
+                if (args[0].equals("?")) {
+                    System.out.println("Usage- [PORT] [ITTERATIONS] [TIMEOUT] -b");
+                    System.out.println("PORT - The port to check. Must be within range 0 to 65525. Integer.");
+                    System.out.println("ITTERATIONS - The number of times you want to loop. Integer.");
+                    System.out.println("TIMEOUT - The time out value to wait for a reply from each ip address. Integer.");
+                    System.out.println("-b - OPTIONAL. Only outputs IP addresses and nothing else.");
+                } else if (args.length < 3 || args.length > 4) { //Check the arguments and generate a usage message if an inbalid  number of arguments were entered.
                     throw new IllegalArgumentException("Usage- [PORT] [ITTERATIONS] [TIMEOUT]");
-                }
+                } else {
+                    int PORT = Integer.parseInt(args[0]);
+                    int LOOPS = Integer.parseInt(args[1]);
+                    int TIMEOUT_VALUE = Integer.parseInt(args[2]);
 
-                new ServerSniffer(PORT, LOOPS, TIMEOUT_VALUE).start(); //Start running the scanner.
+                    if (args.length == 4) { //Check if the basic output flag was passsed in.
+                        if (args[3].equals("-b")) {
+                            basic_output = true;
+                        } else {
+                            throw new IllegalArgumentException("Usage- [PORT] [ITTERATIONS] [TIMEOUT] -b");
+                        }
+                    }
+
+                    if (PORT < 0 || LOOPS < 0 || TIMEOUT_VALUE < 0) {
+                        throw new IllegalArgumentException("Usage- [PORT] [ITTERATIONS] [TIMEOUT]");
+                    }
+
+                    new ServerSniffer(PORT, LOOPS, TIMEOUT_VALUE).start(); //Start running the scanner.
+                }
             }
         } catch (IllegalArgumentException ex) {
             System.out.println(ex.getMessage());
@@ -92,12 +112,17 @@ public class ServerSniffer {
     public void start() {
         servers = new ArrayList<>();
         possibleServers = new ArrayList<>();
+        addressesChecked = 0;
 
         sem = new Semaphore(1);
         semPoss = new Semaphore(1);
 
         if (!basic_output) {
             System.out.println("Checking " + LOOPS + " IP addresses on port " + PORT + " with a timeout value of " + TIMEOUT_VALUE + "ms");
+        }
+
+        if (gui) {
+            g.log("Checking " + LOOPS + " IP addresses on port " + PORT + " with a timeout value of " + TIMEOUT_VALUE + "ms");
         }
 
         for (int i = 0; i < LOOPS; i++) {
@@ -115,6 +140,16 @@ public class ServerSniffer {
                 Thread.sleep(50);
             } catch (InterruptedException ex) {
 
+            }
+        }
+
+        if (gui) {
+            g.complete();
+            g.log("Scan complete!");
+            if (servers.isEmpty() && possibleServers.isEmpty()) {
+                g.log("No servers found on port number " + PORT);
+            } else {
+                g.log(servers.size() + " server(s) and " + possibleServers.size() + " possible server(s) found on port number " + PORT);
             }
         }
 

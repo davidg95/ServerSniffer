@@ -69,12 +69,18 @@ public class ConnectionThread extends Thread {
             //Flow of excecution only reaches this point if a connection was successful.
             sem.acquire();
             ServerSniffer.addressesChecked++;
+            if (ServerSniffer.gui) {
+                if (ServerSniffer.addressesChecked % (double) (LOOPS / 100) == 0) { //Check how many addresses have been scanend and add anohter segment to the progress bar.
+                    ServerSniffer.g.bar(1);
+                }
+                ServerSniffer.g.addAddress(HOST);
+            }
             if (ServerSniffer.addressesChecked % (double) (LOOPS / 20) == 0) { //Check how many addresses have been scanend and add anohter dot to the progress bar.
                 System.out.print(".");
             }
             servers.add(HOST);
             sem.release();
-            
+
             s.close();
         } catch (IOException e) { //If full connection was not established.
             try {
@@ -84,6 +90,11 @@ public class ConnectionThread extends Thread {
             try {
                 ServerSniffer.addressesChecked++;
                 sem.release();
+                if (ServerSniffer.gui) {
+                    if (ServerSniffer.addressesChecked % (double) (LOOPS / 100) == 0) { //Check how many addresses have been scanend and add anohter segment to the progress bar.
+                        ServerSniffer.g.bar(1);
+                    }
+                }
                 if (ServerSniffer.addressesChecked % (double) (LOOPS / 20) == 0) {
                     if (!ServerSniffer.basic_output) {
                         System.out.print(".");
@@ -93,6 +104,9 @@ public class ConnectionThread extends Thread {
                     try {
                         semPoss.acquire();
                     } catch (InterruptedException ex) {
+                    }
+                    if(ServerSniffer.gui){
+                        ServerSniffer.g.addPossibleAddresses(HOST);
                     }
                     possibleServers.add(HOST);
                     semPoss.release();
