@@ -6,7 +6,6 @@
 package serversniffer;
 
 import javax.swing.DefaultListModel;
-import javax.swing.JList;
 import javax.swing.SwingUtilities;
 
 /**
