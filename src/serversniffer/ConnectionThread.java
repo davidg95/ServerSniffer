@@ -28,7 +28,7 @@ public class ConnectionThread extends Thread {
     private final List<String> possibleServers;
     private final Semaphore sem;
     private final Semaphore semPoss;
-    private Socket s;
+    private final Socket s;
 
     /**
      * Constructor method for the thread.
@@ -55,6 +55,7 @@ public class ConnectionThread extends Thread {
         this.possibleServers = possibleServers;
         this.sem = sem;
         this.semPoss = semPoss;
+        s = new Socket();
     }
 
     /**
@@ -63,7 +64,6 @@ public class ConnectionThread extends Thread {
     @Override
     public void run() {
         try {
-            s = new Socket();
             s.connect(new InetSocketAddress(HOST, PORT), TIMEOUT_VALUE); //Try make a connection
 
             //Flow of excecution only reaches this point if a connection was successful.
@@ -105,7 +105,7 @@ public class ConnectionThread extends Thread {
                         semPoss.acquire();
                     } catch (InterruptedException ex) {
                     }
-                    if(ServerSniffer.gui){
+                    if (ServerSniffer.gui) {
                         ServerSniffer.g.addPossibleAddresses(HOST);
                     }
                     possibleServers.add(HOST);

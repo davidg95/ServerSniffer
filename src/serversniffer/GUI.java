@@ -8,6 +8,7 @@ package serversniffer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.DefaultListModel;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 /**
@@ -58,6 +59,10 @@ public class GUI extends javax.swing.JFrame {
         });
     }
 
+    public void showDialog(String text) {
+        JOptionPane.showMessageDialog(this, text, "ServerSniffer", JOptionPane.ERROR_MESSAGE);
+    }
+
     public void complete() {
         prgBar.setValue(100);
         txtPort.setEnabled(true);
@@ -68,7 +73,9 @@ public class GUI extends javax.swing.JFrame {
         lblTimeout.setEnabled(true);
         btnScan.setEnabled(true);
         btnClear.setEnabled(true);
+        btnStop.setEnabled(false);
         panelScan.setEnabled(true);
+        lblMessage.setText("Scan Complete!");
     }
 
     /**
@@ -102,6 +109,7 @@ public class GUI extends javax.swing.JFrame {
         lstAddresses = new javax.swing.JList<>();
         jScrollPane2 = new javax.swing.JScrollPane();
         lstPossibleAddresses = new javax.swing.JList<>();
+        btnStop = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("ServerSniffer");
@@ -147,7 +155,7 @@ public class GUI extends javax.swing.JFrame {
                     .addComponent(lblTimeout))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelScanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtTimeout)
+                    .addComponent(txtTimeout, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
                     .addComponent(txtPort)
                     .addComponent(txtIterations))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -188,6 +196,7 @@ public class GUI extends javax.swing.JFrame {
 
         txtLog.setEditable(false);
         txtLog.setColumns(20);
+        txtLog.setLineWrap(true);
         txtLog.setRows(5);
         txtLog.setPreferredSize(null);
         jScrollPane3.setViewportView(txtLog);
@@ -214,6 +223,14 @@ public class GUI extends javax.swing.JFrame {
         });
         jScrollPane2.setViewportView(lstPossibleAddresses);
 
+        btnStop.setText("Stop Scan");
+        btnStop.setEnabled(false);
+        btnStop.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnStopActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -222,17 +239,14 @@ public class GUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane3)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(lblMessage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnClose))
                     .addComponent(prgBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(panelScan, javax.swing.GroupLayout.DEFAULT_SIZE, 420, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel1)
-                            .addComponent(lblFound))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(lblMessage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblFound, javax.swing.GroupLayout.Alignment.LEADING))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jScrollPane2)
@@ -240,7 +254,12 @@ public class GUI extends javax.swing.JFrame {
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(lblPossibleFound)
                                     .addComponent(jLabel2))
-                                .addGap(0, 122, Short.MAX_VALUE)))))
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(btnStop)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnClose)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -266,7 +285,9 @@ public class GUI extends javax.swing.JFrame {
                     .addComponent(lblFound))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnClose, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(btnClose, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnStop))
                     .addComponent(lblMessage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -277,7 +298,7 @@ public class GUI extends javax.swing.JFrame {
     private void btnScanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnScanActionPerformed
         if (txtPort.getText().equals("")
                 || txtIterations.getText().equals("")
-                || txtTimeout.equals("")) {
+                || txtTimeout.getText().equals("")) {
             lblMessage.setText("Please enter all required fields");
         } else {
             Pattern pattern = Pattern.compile("^([0-9])+$");
@@ -286,34 +307,41 @@ public class GUI extends javax.swing.JFrame {
             Matcher m3 = pattern.matcher(txtTimeout.getText());
 
             if (m1.find() && m2.find() && m3.find()) {
-                prgBar.setValue(0);
-                txtPort.setEnabled(false);
-                txtIterations.setEnabled(false);
-                txtTimeout.setEnabled(false);
-                lblPort.setEnabled(false);
-                lblIterations.setEnabled(false);
-                lblTimeout.setEnabled(false);
-                btnScan.setEnabled(false);
-                btnClear.setEnabled(false);
-                panelScan.setEnabled(false);
-                txtLog.setText("");
-                addressesModel.setSize(0);
-                possibleModel.setSize(0);
-                lstAddresses.setModel(addressesModel);
-                lstPossibleAddresses.setModel(possibleModel);
-                lblMessage.setText("");
-                
                 int port = Integer.parseInt(txtPort.getText());
                 int iterations = Integer.parseInt(txtIterations.getText());
                 int timeout = Integer.parseInt(txtTimeout.getText());
 
-                ServerSniffer ss = new ServerSniffer(port, iterations, timeout);
-                new Thread() {
-                    @Override
-                    public void run() {
-                        ss.start();
-                    }
-                }.start();
+                if (port > 65535) {
+                    showDialog("Port must be in range 0 - 65535");
+                } else {
+                    prgBar.setValue(0);
+                    txtPort.setEnabled(false);
+                    txtIterations.setEnabled(false);
+                    txtTimeout.setEnabled(false);
+                    lblPort.setEnabled(false);
+                    lblIterations.setEnabled(false);
+                    lblTimeout.setEnabled(false);
+                    btnScan.setEnabled(false);
+                    btnClear.setEnabled(false);
+                    btnStop.setEnabled(true);
+                    panelScan.setEnabled(false);
+                    txtLog.setText("");
+                    addressesModel.setSize(0);
+                    possibleModel.setSize(0);
+                    lstAddresses.setModel(addressesModel);
+                    lstPossibleAddresses.setModel(possibleModel);
+                    lblMessage.setText("");
+                    lblFound.setText("Servers Found: 0");
+                    lblPossibleFound.setText("Servers Found: 0");
+
+                    ServerSniffer ss = new ServerSniffer(port, iterations, timeout);
+                    new Thread() {
+                        @Override
+                        public void run() {
+                            ss.start();
+                        }
+                    }.start();
+                }
             } else {
                 lblMessage.setText("Please only enter numerical values");
             }
@@ -324,16 +352,30 @@ public class GUI extends javax.swing.JFrame {
         txtPort.setText("");
         txtIterations.setText("");
         txtTimeout.setText("200");
+        prgBar.setValue(0);
+        txtLog.setText("");
+        addressesModel.setSize(0);
+        possibleModel.setSize(0);
+        lstAddresses.setModel(addressesModel);
+        lstPossibleAddresses.setModel(possibleModel);
+        lblFound.setText("Servers Found: 0");
+        lblPossibleFound.setText("Servers Found: 0");
+        lblMessage.setText("");
     }//GEN-LAST:event_btnClearActionPerformed
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
         System.exit(0);
     }//GEN-LAST:event_btnCloseActionPerformed
 
+    private void btnStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStopActionPerformed
+        ServerSniffer.run = false;
+    }//GEN-LAST:event_btnStopActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClear;
     private javax.swing.JButton btnClose;
     private javax.swing.JButton btnScan;
+    private javax.swing.JButton btnStop;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;

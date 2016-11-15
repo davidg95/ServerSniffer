@@ -6,7 +6,6 @@
 package serversniffer;
 
 import java.awt.GraphicsEnvironment;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -39,6 +38,7 @@ public class ServerSniffer {
     private Semaphore semPoss;
 
     public static GUI g;
+    public static boolean run;
 
     public static boolean gui = false;
     public static boolean basic_output = false;
@@ -89,6 +89,10 @@ public class ServerSniffer {
                     if (PORT < 0 || LOOPS < 0 || TIMEOUT_VALUE < 0) {
                         throw new IllegalArgumentException("Usage- [PORT] [ITTERATIONS] [TIMEOUT]");
                     }
+                    
+                    if(PORT > 65535){
+                        throw new IllegalArgumentException("Port must be in range 0-65535");
+                    }
 
                     new ServerSniffer(PORT, LOOPS, TIMEOUT_VALUE).start(); //Start running the scanner.
                 }
@@ -118,6 +122,7 @@ public class ServerSniffer {
         servers = new ArrayList<>();
         possibleServers = new ArrayList<>();
         addressesChecked = 0;
+        run = true;
 
         sem = new Semaphore(1);
         semPoss = new Semaphore(1);
@@ -134,6 +139,9 @@ public class ServerSniffer {
 
         for (int i = 0; i < LOOPS; i++) {
             new ConnectionThread(generatePublicIP(), PORT, TIMEOUT_VALUE, LOOPS, servers, possibleServers, sem, semPoss).start(); //Create the threads
+            if (!run) {
+                break;
+            }
         }
 
         if (LOOPS < 20) { //If loops is less than 20 then just print 20 dots to screen as the thread wont be able to.
@@ -142,18 +150,20 @@ public class ServerSniffer {
             }
         }
 
-        while (addressesChecked != LOOPS) { //Wait here until all threads are completed excecution.
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException ex) {
+        if (run) {
+            while (addressesChecked != LOOPS) { //Wait here until all threads are completed excecution.
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException ex) {
 
+                }
             }
         }
-        
+
         finnishTime = Calendar.getInstance().getTimeInMillis();
 
         duration = finnishTime - startTime;
-        
+
         if (gui) {
             g.complete();
             g.log("Scan complete in " + (duration / 1000) + "s!");
@@ -180,17 +190,17 @@ public class ServerSniffer {
                 if (!basic_output) {
                     System.out.println("Servers-");
                 }
-                for (String ip : servers) {
+                servers.forEach((ip) -> {
                     System.out.println(ip);
-                }
+                });
             }
             if (!possibleServers.isEmpty()) { //Check if any possible servers were found and display them.
                 if (!basic_output) {
                     System.out.println("\nPossible servers-");
                 }
-                for (String ip : possibleServers) {
+                possibleServers.forEach((ip) -> {
                     System.out.println(ip);
-                }
+                });
             }
             if (!basic_output) {
                 System.out.println("\n" + (int) (servers.size() + possibleServers.size()) + " servers found");
