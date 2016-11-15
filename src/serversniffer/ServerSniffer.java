@@ -212,7 +212,7 @@ public class ServerSniffer {
                         file.delete();
                         FileWriter writer = new FileWriter(file, true);
                         PrintWriter out = new PrintWriter(writer);
-                        
+
                         servers.forEach((ip) -> {
                             out.println(ip);
                         });
@@ -222,7 +222,7 @@ public class ServerSniffer {
                         g.log("Results saved to " + file.getAbsolutePath());
                         Desktop.getDesktop().open(file);
                     } catch (IOException ex) {
-                        
+
                     }
                 }
             }
@@ -259,7 +259,34 @@ public class ServerSniffer {
             octet4 = (int) (Math.random() * 255);
 
             //Check that the IP is a valid usable public IP address.
-            valid = !(octet1 == 0 || (octet1 == 10 && octet2 >= 64 && octet2 <= 127) || octet1 == 127 || (octet1 == 169 && octet2 == 254) || (octet1 == 172 && octet2 >= 16 && octet2 <= 31) || (octet1 == 192 && octet2 == 0 && (octet3 == 0 || octet3 == 2)) || (octet1 == 192 && octet2 == 88 && octet3 == 99) || (octet1 == 192 && octet2 == 168) || (octet1 == 198 && (octet2 == 18 || (octet2 == 52 && octet2 == 100))) || (octet1 == 203 && octet2 == 0 && octet3 == 113) || octet1 >= 224);
+            //From https://en.wikipedia.org/wiki/Reserved_IP_addresses.
+            valid = !(octet1 == 0
+                    || //0.0.0.0 - 0.255.255.255
+                    octet1 == 10
+                    || //10.0.0.0 - 10.255.255.255
+                    (octet1 == 10 && octet2 > 64 && octet2 < 127)
+                    || //10.64.0.0 - 10.127.255.255
+                    octet1 == 127
+                    || //127.0.0.0 - 127.255.255.255
+                    (octet1 == 169 && octet2 == 254)
+                    || //169.254.0.0 - 169.254.255.255
+                    (octet1 == 172 && octet2 >= 16 && octet2 <= 31)
+                    || //172.16.0.0 - 172.32.255.255
+                    (octet1 == 192 && octet2 == 0 && octet3 == 0)
+                    || //192.0.0.0 - 192.0.0.255
+                    (octet1 == 192 && octet2 == 0 && octet3 == 2)
+                    || //192.0.2.0 - 192.0.2.255
+                    (octet1 == 192 && octet2 == 88 && octet3 == 99)
+                    || //192.88.99.0 - 192.88.99.255
+                    (octet1 == 192 && octet2 == 168)
+                    || //192.168.0.0 - 192.168.255.255
+                    (octet1 == 198 && (octet2 == 18 || octet2 == 19))
+                    || //198.18.0.0 - 198.19.255.255
+                    (octet1 == 198 && octet2 == 51 && octet3 == 100)
+                    || //198.51.100.0 - 198.51.100.255
+                    (octet1 == 203 && octet2 == 0 && octet3 == 113)
+                    || //203.0.113.0 - 203.0.113.255
+                    octet1 >= 224); //224.0.0.0 - 255.255.255.255
         }
 
         return octet1 + "." + octet2 + "." + octet3 + "." + octet4;

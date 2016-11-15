@@ -13,7 +13,7 @@
 <executableName>ServerSniffer.exe</executableName>
 <initialMemoryHeap>-1</initialMemoryHeap>
 <mainClassName>serversniffer.ServerSniffer</mainClassName>
-<maximumMemoryHeap>-1</maximumMemoryHeap>
+<maximumMemoryHeap>1073741824</maximumMemoryHeap>
 <maximumVersion></maximumVersion>
 <minimumVersion>1.4</minimumVersion>
 <skeletonName>Windowed Wrapper</skeletonName>
