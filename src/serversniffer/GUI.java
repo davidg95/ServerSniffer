@@ -14,6 +14,7 @@ import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
@@ -35,6 +36,8 @@ public class GUI extends javax.swing.JFrame {
         possibleModel = new DefaultListModel();
         lstAddresses.setModel(addressesModel);
         lstPossibleAddresses.setModel(possibleModel);
+        ClassLoader classLoader = getClass().getClassLoader();
+//        setIconImage(new ImageIcon(getClass().getClassLoader().getResource("resources/favicon.ico")).getImage());
     }
 
     public void log(String text) {
