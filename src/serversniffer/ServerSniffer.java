@@ -89,8 +89,8 @@ public class ServerSniffer {
                     if (PORT < 0 || LOOPS < 0 || TIMEOUT_VALUE < 0) {
                         throw new IllegalArgumentException("Usage- [PORT] [ITTERATIONS] [TIMEOUT]");
                     }
-                    
-                    if(PORT > 65535){
+
+                    if (PORT > 65535) {
                         throw new IllegalArgumentException("Port must be in range 0-65535");
                     }
 
@@ -137,27 +137,32 @@ public class ServerSniffer {
 
         startTime = Calendar.getInstance().getTimeInMillis();
 
-        for (int i = 0; i < LOOPS; i++) {
-            new ConnectionThread(generatePublicIP(), PORT, TIMEOUT_VALUE, LOOPS, servers, possibleServers, sem, semPoss).start(); //Create the threads
-            if (!run) {
-                break;
-            }
-        }
-
-        if (LOOPS < 20) { //If loops is less than 20 then just print 20 dots to screen as the thread wont be able to.
-            if (!basic_output) {
-                System.out.println("....................");
-            }
-        }
-
-        if (run) {
-            while (addressesChecked != LOOPS) { //Wait here until all threads are completed excecution.
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException ex) {
-
+        try {
+            for (int i = 0; i < LOOPS; i++) {
+                new ConnectionThread(generatePublicIP(), PORT, TIMEOUT_VALUE, LOOPS, servers, possibleServers, sem, semPoss).start(); //Create the threads
+                if (!run) {
+                    break;
                 }
             }
+
+            if (LOOPS < 20) { //If loops is less than 20 then just print 20 dots to screen as the thread wont be able to.
+                if (!basic_output) {
+                    System.out.println("....................");
+                }
+            }
+
+            if (run) {
+                while (addressesChecked != LOOPS) { //Wait here until all threads are completed excecution.
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException ex) {
+
+                    }
+                }
+            }
+        } catch (OutOfMemoryError ex) {
+            g.log("Out of memory");
+            g.showDialog("There is not enough avaliable memory on your system to complete the scan.");
         }
 
         finnishTime = Calendar.getInstance().getTimeInMillis();
