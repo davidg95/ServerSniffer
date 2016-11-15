@@ -6,10 +6,16 @@
 package serversniffer;
 
 import java.awt.GraphicsEnvironment;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.Semaphore;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Server sniffer application which accepts a port number, number of iterations
@@ -39,6 +45,7 @@ public class ServerSniffer {
 
     public static GUI g;
     public static boolean run;
+    public static boolean save;
 
     public static boolean gui = false;
     public static boolean basic_output = false;
@@ -195,9 +202,29 @@ public class ServerSniffer {
                 if (!basic_output) {
                     System.out.println("Servers-");
                 }
+
                 servers.forEach((ip) -> {
                     System.out.println(ip);
                 });
+
+                if (save) {
+                    try {
+                        File file = new File("ip.txt");
+                        file.delete();
+                        FileWriter writer = new FileWriter(file, true);
+                        PrintWriter out = new PrintWriter(writer);
+                        
+                        servers.forEach((ip) -> {
+                            out.println(ip);
+                        });
+                        out.flush();
+                        out.close();
+                        writer.close();
+                        g.log("Results saved to " + file.getAbsolutePath());
+                    } catch (IOException ex) {
+                        
+                    }
+                }
             }
             if (!possibleServers.isEmpty()) { //Check if any possible servers were found and display them.
                 if (!basic_output) {
