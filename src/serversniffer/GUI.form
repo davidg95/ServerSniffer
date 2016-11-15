@@ -190,6 +190,9 @@
       </Layout>
       <SubComponents>
         <Component class="javax.swing.JTextField" name="txtPort">
+          <Properties>
+            <Property name="toolTipText" type="java.lang.String" value="Must be in range 0 - 65535"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="lblPort">
           <Properties>
@@ -202,10 +205,14 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtIterations">
+          <Properties>
+            <Property name="toolTipText" type="java.lang.String" value="The number of addresses to scan"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtTimeout">
           <Properties>
             <Property name="text" type="java.lang.String" value="200"/>
+            <Property name="toolTipText" type="java.lang.String" value="The timeout value for each connection"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="lblTimeout">
@@ -216,6 +223,7 @@
         <Component class="javax.swing.JButton" name="btnScan">
           <Properties>
             <Property name="text" type="java.lang.String" value="Start Scan"/>
+            <Property name="toolTipText" type="java.lang.String" value="Start a scan"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnScanActionPerformed"/>
@@ -224,6 +232,7 @@
         <Component class="javax.swing.JButton" name="btnClear">
           <Properties>
             <Property name="text" type="java.lang.String" value="Clear"/>
+            <Property name="toolTipText" type="java.lang.String" value="Clear the window"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnClearActionPerformed"/>
@@ -232,6 +241,7 @@
         <Component class="javax.swing.JCheckBox" name="chkResults">
           <Properties>
             <Property name="text" type="java.lang.String" value="Save results to text file"/>
+            <Property name="toolTipText" type="java.lang.String" value="Check this box if you want results saved to a text file"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkResultsActionPerformed"/>
@@ -249,6 +259,7 @@
     <Component class="javax.swing.JButton" name="btnClose">
       <Properties>
         <Property name="text" type="java.lang.String" value="Close"/>
+        <Property name="toolTipText" type="java.lang.String" value="Exit the application"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCloseActionPerformed"/>
@@ -315,6 +326,9 @@
               </StringArray>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lstAddressesMouseClicked"/>
+          </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
           </AuxValues>
@@ -340,6 +354,9 @@
               </StringArray>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lstPossibleAddressesMouseClicked"/>
+          </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
           </AuxValues>
@@ -349,6 +366,7 @@
     <Component class="javax.swing.JButton" name="btnStop">
       <Properties>
         <Property name="text" type="java.lang.String" value="Stop Scan"/>
+        <Property name="toolTipText" type="java.lang.String" value="Stop the current scan"/>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>

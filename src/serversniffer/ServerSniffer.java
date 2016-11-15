@@ -5,6 +5,7 @@
  */
 package serversniffer;
 
+import java.awt.Desktop;
 import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.FileWriter;
@@ -14,8 +15,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.Semaphore;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Server sniffer application which accepts a port number, number of iterations
@@ -221,6 +220,7 @@ public class ServerSniffer {
                         out.close();
                         writer.close();
                         g.log("Results saved to " + file.getAbsolutePath());
+                        Desktop.getDesktop().open(file);
                     } catch (IOException ex) {
                         
                     }
