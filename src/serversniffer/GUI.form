@@ -68,7 +68,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="panelScan" pref="124" max="32767" attributes="0"/>
+              <Component id="panelScan" pref="139" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jScrollPane3" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -172,7 +172,7 @@
                               <Component id="txtTimeout" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="lblTimeout" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <EmptySpace pref="14" max="32767" attributes="0"/>
                           <Component id="chkResults" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
@@ -192,7 +192,13 @@
         <Component class="javax.swing.JTextField" name="txtPort">
           <Properties>
             <Property name="toolTipText" type="java.lang.String" value="Must be in range 0 - 65535"/>
+            <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+              <ComponentRef name="txtIterations"/>
+            </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtPortActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="lblPort">
           <Properties>
@@ -207,13 +213,22 @@
         <Component class="javax.swing.JTextField" name="txtIterations">
           <Properties>
             <Property name="toolTipText" type="java.lang.String" value="The number of addresses to scan"/>
+            <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+              <ComponentRef name="txtTimeout"/>
+            </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtIterationsActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JTextField" name="txtTimeout">
           <Properties>
             <Property name="text" type="java.lang.String" value="200"/>
             <Property name="toolTipText" type="java.lang.String" value="The timeout value for each connection"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtTimeoutActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="lblTimeout">
           <Properties>

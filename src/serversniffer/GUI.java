@@ -10,11 +10,9 @@ import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
@@ -36,8 +34,7 @@ public class GUI extends javax.swing.JFrame {
         possibleModel = new DefaultListModel();
         lstAddresses.setModel(addressesModel);
         lstPossibleAddresses.setModel(possibleModel);
-        ClassLoader classLoader = getClass().getClassLoader();
-//        setIconImage(new ImageIcon(getClass().getClassLoader().getResource("resources/favicon.ico")).getImage());
+        prgBar.setStringPainted(true);
     }
 
     public void log(String text) {
@@ -80,6 +77,7 @@ public class GUI extends javax.swing.JFrame {
             comp.setEnabled(true);
         }
         lblMessage.setText("Scan Complete!");
+        txtPort.requestFocusInWindow();
     }
 
     /**
@@ -127,15 +125,32 @@ public class GUI extends javax.swing.JFrame {
         panelScan.setPreferredSize(new java.awt.Dimension(417, 95));
 
         txtPort.setToolTipText("Must be in range 0 - 65535");
+        txtPort.setNextFocusableComponent(txtIterations);
+        txtPort.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtPortActionPerformed(evt);
+            }
+        });
 
         lblPort.setText("Port:");
 
         lblIterations.setText("Addresses To Scan:");
 
         txtIterations.setToolTipText("The number of addresses to scan");
+        txtIterations.setNextFocusableComponent(txtTimeout);
+        txtIterations.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtIterationsActionPerformed(evt);
+            }
+        });
 
         txtTimeout.setText("200");
         txtTimeout.setToolTipText("The timeout value for each connection");
+        txtTimeout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtTimeoutActionPerformed(evt);
+            }
+        });
 
         lblTimeout.setText("Timeout Value (ms):");
 
@@ -205,7 +220,7 @@ public class GUI extends javax.swing.JFrame {
                         .addGroup(panelScanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(txtTimeout, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(lblTimeout))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
                         .addComponent(chkResults))
                     .addGroup(panelScanLayout.createSequentialGroup()
                         .addContainerGap()
@@ -309,7 +324,7 @@ public class GUI extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panelScan, javax.swing.GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE)
+                .addComponent(panelScan, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -417,7 +432,7 @@ public class GUI extends javax.swing.JFrame {
         if (evt.getClickCount() == 2 && !addressesModel.isEmpty()) {
             String address = lstAddresses.getSelectedValue();
             try {
-                Desktop.getDesktop().browse(new URI(new URL(address).toString()));
+                Desktop.getDesktop().browse(new URI("http://" + address));
             } catch (URISyntaxException | IOException ex) {
                 showDialog("Error Opening URL " + address);
             }
@@ -428,12 +443,24 @@ public class GUI extends javax.swing.JFrame {
         if (evt.getClickCount() == 2 && !possibleModel.isEmpty()) {
             String address = lstPossibleAddresses.getSelectedValue();
             try {
-                Desktop.getDesktop().browse(new URI(new URL(address).toString()));
+                Desktop.getDesktop().browse(new URI("http://" + address));
             } catch (URISyntaxException | IOException ex) {
                 showDialog("Error Opening URL " + address);
             }
         }
     }//GEN-LAST:event_lstPossibleAddressesMouseClicked
+
+    private void txtPortActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPortActionPerformed
+        btnScan.doClick();
+    }//GEN-LAST:event_txtPortActionPerformed
+
+    private void txtIterationsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIterationsActionPerformed
+        btnScan.doClick();
+    }//GEN-LAST:event_txtIterationsActionPerformed
+
+    private void txtTimeoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTimeoutActionPerformed
+        btnScan.doClick();
+    }//GEN-LAST:event_txtTimeoutActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClear;

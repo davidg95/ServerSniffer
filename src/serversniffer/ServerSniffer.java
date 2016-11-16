@@ -210,15 +210,15 @@ public class ServerSniffer {
                     try {
                         File file = new File("ip.txt");
                         file.delete();
-                        FileWriter writer = new FileWriter(file, true);
-                        PrintWriter out = new PrintWriter(writer);
-
-                        servers.forEach((ip) -> {
-                            out.println(ip);
-                        });
-                        out.flush();
-                        out.close();
-                        writer.close();
+                        try (FileWriter writer = new FileWriter(file, true); PrintWriter out = new PrintWriter(writer)) {
+                            servers.forEach((ip) -> {
+                                out.println(ip);
+                            });
+                            possibleServers.forEach((ip) -> {
+                                out.println(ip);
+                            });
+                            out.flush();
+                        }
                         g.log("Results saved to " + file.getAbsolutePath());
                         Desktop.getDesktop().open(file);
                     } catch (IOException ex) {
