@@ -20,7 +20,8 @@ import java.util.concurrent.Semaphore;
  */
 public class ConnectionThread extends Thread {
 
-    private final String HOST;
+    private final String HOST1;
+    private String HOST2;
     private final int PORT;
     private final int TIMEOUT_VALUE;
     private final int LOOPS;
@@ -28,7 +29,8 @@ public class ConnectionThread extends Thread {
     private final List<String> possibleServers;
     private final Semaphore sem;
     private final Semaphore semPoss;
-    private final Socket s;
+    private Socket s;
+    private int noIPs;
 
     /**
      * Constructor method for the thread.
@@ -47,7 +49,7 @@ public class ConnectionThread extends Thread {
      * @param semPoss the semaphore to protect the possible servers list
      */
     public ConnectionThread(String HOST, int PORT, int TIMEOUT_VALUE, int LOOPS, List<String> servers, List<String> possibleServers, Semaphore sem, Semaphore semPoss) {
-        this.HOST = HOST;
+        this.HOST1 = HOST;
         this.PORT = PORT;
         this.TIMEOUT_VALUE = TIMEOUT_VALUE;
         this.LOOPS = LOOPS;
@@ -56,6 +58,30 @@ public class ConnectionThread extends Thread {
         this.sem = sem;
         this.semPoss = semPoss;
         s = new Socket();
+        noIPs = 1;
+    }
+
+    /**
+     * Constructor method for the thread.
+     *
+     * @param HOST1 the host which is being checked
+     * @param HOST2 the host which is being checked
+     * @param PORT the port it is being checked on
+     * @param TIMEOUT_VALUE the timeout value for the connection
+     * @param LOOPS the number of IP addresses getting checked altogether, this
+     * is required for the loading dots
+     * @param servers the list for storing IP addresses which have servers
+     * running on the specified port.
+     * @param possibleServers the list for storing IP addresses which have
+     * possible servers, an address is added to the list of no reply was
+     * received but the connection gets blocked
+     * @param sem the semaphore to protect the servers list
+     * @param semPoss the semaphore to protect the possible servers list
+     */
+    public ConnectionThread(String HOST1, String HOST2, int PORT, int TIMEOUT_VALUE, int LOOPS, List<String> servers, List<String> possibleServers, Semaphore sem, Semaphore semPoss) {
+        this(HOST1, PORT, TIMEOUT_VALUE, LOOPS, servers, possibleServers, sem, semPoss);
+        this.HOST2 = HOST2;
+        noIPs = 2;
     }
 
     /**
@@ -64,7 +90,7 @@ public class ConnectionThread extends Thread {
     @Override
     public void run() {
         try {
-            s.connect(new InetSocketAddress(HOST, PORT), TIMEOUT_VALUE); //Try make a connection
+            s.connect(new InetSocketAddress(HOST1, PORT), TIMEOUT_VALUE); //Try make a connection
 
             //Flow of excecution only reaches this point if a connection was successful.
             sem.acquire();
@@ -73,12 +99,12 @@ public class ConnectionThread extends Thread {
                 if (ServerSniffer.addressesChecked % (double) (LOOPS / 100) == 0) { //Check how many addresses have been scanend and add anohter segment to the progress bar.
                     ServerSniffer.g.bar(1);
                 }
-                ServerSniffer.g.addAddress(HOST);
+                ServerSniffer.g.addAddress(HOST1);
             }
             if (ServerSniffer.addressesChecked % (double) (LOOPS / 20) == 0) { //Check how many addresses have been scanend and add anohter dot to the progress bar.
                 System.out.print(".");
             }
-            servers.add(HOST);
+            servers.add(HOST1);
             sem.release();
 
             s.close();
@@ -106,14 +132,68 @@ public class ConnectionThread extends Thread {
                     } catch (InterruptedException ex) {
                     }
                     if (ServerSniffer.gui) {
-                        ServerSniffer.g.addPossibleAddresses(HOST);
+                        ServerSniffer.g.addPossibleAddresses(HOST1);
                     }
-                    possibleServers.add(HOST);
+                    possibleServers.add(HOST1);
                     semPoss.release();
                 }
             } catch (NullPointerException en) {
             }
         } catch (InterruptedException ex) {
+        }
+        if (noIPs == 2) {
+            try {
+                s.connect(new InetSocketAddress(HOST2, PORT), TIMEOUT_VALUE); //Try make a connection
+
+                //Flow of excecution only reaches this point if a connection was successful.
+                sem.acquire();
+                ServerSniffer.addressesChecked++;
+                if (ServerSniffer.gui) {
+                    if (ServerSniffer.addressesChecked % (double) (LOOPS / 100) == 0) { //Check how many addresses have been scanend and add anohter segment to the progress bar.
+                        ServerSniffer.g.bar(1);
+                    }
+                    ServerSniffer.g.addAddress(HOST2);
+                }
+                if (ServerSniffer.addressesChecked % (double) (LOOPS / 20) == 0) { //Check how many addresses have been scanend and add anohter dot to the progress bar.
+                    System.out.print(".");
+                }
+                servers.add(HOST2);
+                sem.release();
+
+                s.close();
+            } catch (IOException e) { //If full connection was not established.
+                try {
+                    sem.acquire();
+                } catch (InterruptedException ex) {
+                }
+                try {
+                    ServerSniffer.addressesChecked++;
+                    sem.release();
+                    if (ServerSniffer.gui) {
+                        if (ServerSniffer.addressesChecked % (double) (LOOPS / 100) == 0) { //Check how many addresses have been scanend and add anohter segment to the progress bar.
+                            ServerSniffer.g.bar(1);
+                        }
+                    }
+                    if (ServerSniffer.addressesChecked % (double) (LOOPS / 20) == 0) {
+                        if (!ServerSniffer.basic_output) {
+                            System.out.print(".");
+                        }
+                    }
+                    if (e.getMessage().equals("Connection refused: connect")) { //Check if the connection was forcibly blocked.
+                        try {
+                            semPoss.acquire();
+                        } catch (InterruptedException ex) {
+                        }
+                        if (ServerSniffer.gui) {
+                            ServerSniffer.g.addPossibleAddresses(HOST2);
+                        }
+                        possibleServers.add(HOST2);
+                        semPoss.release();
+                    }
+                } catch (NullPointerException en) {
+                }
+            } catch (InterruptedException ex) {
+            }
         }
     }
 }

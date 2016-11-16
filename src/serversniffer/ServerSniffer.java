@@ -142,7 +142,7 @@ public class ServerSniffer {
         }
 
         startTime = Calendar.getInstance().getTimeInMillis();
-
+        
         try {
             for (int i = 0; i < LOOPS; i++) {
                 new ConnectionThread(generatePublicIP(), PORT, TIMEOUT_VALUE, LOOPS, servers, possibleServers, sem, semPoss).start(); //Create the threads
