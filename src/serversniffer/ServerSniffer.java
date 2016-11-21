@@ -157,21 +157,21 @@ public class ServerSniffer {
                 }
             }
 
-            if (run) {
-                while (addressesChecked != LOOPS) { //Wait here until all threads are completed excecution.
-                    if (!run) {
-                        break;
-                    }
-                    try {
-                        Thread.sleep(50);
-                    } catch (InterruptedException ex) {
+            while (addressesChecked != LOOPS) { //Wait here until all threads are completed excecution.
+                if (!run) {
+                    break;
+                }
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException ex) {
 
-                    }
                 }
             }
         } catch (OutOfMemoryError ex) {
-            g.log("Out of memory");
-            g.showDialog("There is not enough avaliable memory on your system to complete the scan.");
+            if (gui) {
+                g.log("Out of memory");
+                g.showDialog("There is not enough avaliable memory on your system to complete the scan.");
+            }
         }
 
         finnishTime = Calendar.getInstance().getTimeInMillis();
