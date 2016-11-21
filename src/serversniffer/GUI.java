@@ -116,7 +116,6 @@ public class GUI extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("ServerSniffer");
-        setMaximumSize(new java.awt.Dimension(1000, 1000));
         setResizable(false);
 
         panelScan.setBorder(javax.swing.BorderFactory.createTitledBorder("Enter New Scan"));
@@ -417,7 +416,7 @@ public class GUI extends javax.swing.JFrame {
     }//GEN-LAST:event_btnClearActionPerformed
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-        this.setVisible(false);
+        System.exit(0);
     }//GEN-LAST:event_btnCloseActionPerformed
 
     private void btnStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStopActionPerformed
