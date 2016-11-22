@@ -7,13 +7,19 @@ package serversniffer;
 
 import java.awt.Component;
 import java.awt.Desktop;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.DefaultListModel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
 /**
@@ -428,24 +434,78 @@ public class GUI extends javax.swing.JFrame {
     }//GEN-LAST:event_chkResultsActionPerformed
 
     private void lstAddressesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lstAddressesMouseClicked
-        if (evt.getClickCount() == 2 && !addressesModel.isEmpty()) {
-            String address = lstAddresses.getSelectedValue();
-            try {
-                Desktop.getDesktop().browse(new URI("http://" + address));
-            } catch (URISyntaxException | IOException ex) {
-                showDialog("Error Opening URL " + address);
+        if (SwingUtilities.isLeftMouseButton(evt)) {
+            if (evt.getClickCount() == 2 && !addressesModel.isEmpty()) {
+                String address = lstAddresses.getSelectedValue();
+                try {
+                    Desktop.getDesktop().browse(new URI("http://" + address));
+                } catch (URISyntaxException | IOException ex) {
+                    showDialog("Error Opening URL " + address);
+                }
             }
+        } else if (SwingUtilities.isRightMouseButton(evt)) {
+            int row = lstAddresses.locationToIndex(evt.getPoint());
+            lstAddresses.setSelectedIndex(row);
+            JPopupMenu popup = new JPopupMenu();
+            JMenuItem browser;
+            JMenuItem copy;
+            browser = new JMenuItem("Open in browser");
+            browser.addActionListener((ActionEvent e) -> {
+                String address = lstAddresses.getSelectedValue();
+                try {
+                    Desktop.getDesktop().browse(new URI("http://" + address));
+                } catch (URISyntaxException | IOException ex) {
+                    showDialog("Error Opening URL " + address);
+                }
+            });
+            copy = new JMenuItem("Copy to clipboard");
+            copy.addActionListener((ActionEvent e) -> {
+                String address = lstAddresses.getSelectedValue();
+                StringSelection sel = new StringSelection(address);
+                Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
+                cb.setContents(sel, null);
+            });
+            popup.add(browser);
+            popup.add(copy);
+            popup.show(lstAddresses, evt.getX(), evt.getY());
         }
     }//GEN-LAST:event_lstAddressesMouseClicked
 
     private void lstPossibleAddressesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lstPossibleAddressesMouseClicked
-        if (evt.getClickCount() == 2 && !possibleModel.isEmpty()) {
-            String address = lstPossibleAddresses.getSelectedValue();
-            try {
-                Desktop.getDesktop().browse(new URI("http://" + address));
-            } catch (URISyntaxException | IOException ex) {
-                showDialog("Error Opening URL " + address);
+        if (SwingUtilities.isLeftMouseButton(evt)) {
+            if (evt.getClickCount() == 2 && !possibleModel.isEmpty()) {
+                String address = lstPossibleAddresses.getSelectedValue();
+                try {
+                    Desktop.getDesktop().browse(new URI("http://" + address));
+                } catch (URISyntaxException | IOException ex) {
+                    showDialog("Error Opening URL " + address);
+                }
             }
+        } else if (SwingUtilities.isRightMouseButton(evt)) {
+            int row = lstPossibleAddresses.locationToIndex(evt.getPoint());
+            lstPossibleAddresses.setSelectedIndex(row);
+            JPopupMenu popup = new JPopupMenu();
+            JMenuItem browser;
+            JMenuItem copy;
+            browser = new JMenuItem("Open in browser");
+            browser.addActionListener((ActionEvent e) -> {
+                String address = lstPossibleAddresses.getSelectedValue();
+                try {
+                    Desktop.getDesktop().browse(new URI("http://" + address));
+                } catch (URISyntaxException | IOException ex) {
+                    showDialog("Error Opening URL " + address);
+                }
+            });
+            copy = new JMenuItem("Copy to clipboard");
+            copy.addActionListener((ActionEvent e) -> {
+                String address = lstPossibleAddresses.getSelectedValue();
+                StringSelection sel = new StringSelection(address);
+                Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
+                cb.setContents(sel, null);
+            });
+            popup.add(browser);
+            popup.add(copy);
+            popup.show(lstPossibleAddresses, evt.getX(), evt.getY());
         }
     }//GEN-LAST:event_lstPossibleAddressesMouseClicked
 
