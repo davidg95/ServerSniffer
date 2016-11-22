@@ -211,7 +211,7 @@ public class ServerSniffer {
 
                 if (save) {
                     try {
-                        File file = new File("ip.txt");
+                        File file = new File("port" + PORT + ".txt");
                         file.delete();
                         try (FileWriter writer = new FileWriter(file, true); PrintWriter out = new PrintWriter(writer)) {
                             servers.forEach((ip) -> {
