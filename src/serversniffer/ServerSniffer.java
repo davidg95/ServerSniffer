@@ -180,7 +180,8 @@ public class ServerSniffer {
 
         if (gui) {
             g.complete();
-            g.log("Scan complete in " + (duration / 1000) + "s!");
+            double dur = duration;
+            g.log("Scan complete in " + (dur / 1000) + "s!");
             if (servers.isEmpty() && possibleServers.isEmpty()) {
                 g.log("No servers found on port number " + PORT);
             } else {
