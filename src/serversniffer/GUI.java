@@ -11,12 +11,15 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -86,6 +89,19 @@ public class GUI extends javax.swing.JFrame {
         txtPort.requestFocusInWindow();
     }
 
+    private void openInBrowser(String address) {
+        try {
+            Desktop.getDesktop().browse(new URI("http://" + address));
+        } catch (URISyntaxException | IOException ex) {
+            showDialog("Error Opening URL " + address);
+        }
+    }
+
+    private void copyToClipboard(String address) {
+        Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
+        cb.setContents(new StringSelection(address), null);
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -122,6 +138,7 @@ public class GUI extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("ServerSniffer");
+        setIconImage(new ImageIcon(getClass().getResource("/resources/icon1.png")).getImage());
         setResizable(false);
 
         panelScan.setBorder(javax.swing.BorderFactory.createTitledBorder("Enter New Scan"));
@@ -437,11 +454,7 @@ public class GUI extends javax.swing.JFrame {
         if (SwingUtilities.isLeftMouseButton(evt)) {
             if (evt.getClickCount() == 2 && !addressesModel.isEmpty()) {
                 String address = lstAddresses.getSelectedValue();
-                try {
-                    Desktop.getDesktop().browse(new URI("http://" + address));
-                } catch (URISyntaxException | IOException ex) {
-                    showDialog("Error Opening URL " + address);
-                }
+                openInBrowser(address);
             }
         } else if (SwingUtilities.isRightMouseButton(evt)) {
             int row = lstAddresses.locationToIndex(evt.getPoint());
@@ -452,18 +465,12 @@ public class GUI extends javax.swing.JFrame {
             browser = new JMenuItem("Open in browser");
             browser.addActionListener((ActionEvent e) -> {
                 String address = lstAddresses.getSelectedValue();
-                try {
-                    Desktop.getDesktop().browse(new URI("http://" + address));
-                } catch (URISyntaxException | IOException ex) {
-                    showDialog("Error Opening URL " + address);
-                }
+                openInBrowser(address);
             });
             copy = new JMenuItem("Copy to clipboard");
             copy.addActionListener((ActionEvent e) -> {
                 String address = lstAddresses.getSelectedValue();
-                StringSelection sel = new StringSelection(address);
-                Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
-                cb.setContents(sel, null);
+                copyToClipboard(address);
             });
             popup.add(browser);
             popup.add(copy);
@@ -475,11 +482,7 @@ public class GUI extends javax.swing.JFrame {
         if (SwingUtilities.isLeftMouseButton(evt)) {
             if (evt.getClickCount() == 2 && !possibleModel.isEmpty()) {
                 String address = lstPossibleAddresses.getSelectedValue();
-                try {
-                    Desktop.getDesktop().browse(new URI("http://" + address));
-                } catch (URISyntaxException | IOException ex) {
-                    showDialog("Error Opening URL " + address);
-                }
+                openInBrowser(address);
             }
         } else if (SwingUtilities.isRightMouseButton(evt)) {
             int row = lstPossibleAddresses.locationToIndex(evt.getPoint());
@@ -490,18 +493,12 @@ public class GUI extends javax.swing.JFrame {
             browser = new JMenuItem("Open in browser");
             browser.addActionListener((ActionEvent e) -> {
                 String address = lstPossibleAddresses.getSelectedValue();
-                try {
-                    Desktop.getDesktop().browse(new URI("http://" + address));
-                } catch (URISyntaxException | IOException ex) {
-                    showDialog("Error Opening URL " + address);
-                }
+                openInBrowser(address);
             });
             copy = new JMenuItem("Copy to clipboard");
             copy.addActionListener((ActionEvent e) -> {
                 String address = lstPossibleAddresses.getSelectedValue();
-                StringSelection sel = new StringSelection(address);
-                Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
-                cb.setContents(sel, null);
+                copyToClipboard(address);
             });
             popup.add(browser);
             popup.add(copy);
